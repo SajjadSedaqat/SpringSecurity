@@ -11,6 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.sajjad.springsecurity.security.ApplicationUserRole.ADMIN;
+import static com.sajjad.springsecurity.security.ApplicationUserRole.STUDENT;
+
 
 @Configuration
 @EnableWebSecurity
@@ -30,6 +33,8 @@ public class ApplicationSecurityConfig {
                 .authorizeHttpRequests()
                 //This is a replacement for antMatcher
                 .requestMatchers("/*", "index", "/css/*", "/js/*").permitAll()
+                //Important This is for role base authentication we are just using roles not Permissions Important
+                .requestMatchers("/api/**").hasRole(STUDENT.name())
                 //This says any other request
                 .anyRequest()
                 .authenticated()
@@ -44,12 +49,23 @@ public class ApplicationSecurityConfig {
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
 
-        UserDetails user = User.builder()
+        UserDetails userDetails = User.builder()
                 .username("Sajjad")
                 .password(passwordEncoder.encode("123456"))
-                .roles("STUDENT") // This internally be ROLE_STUDENT
+                //Important This is for role base authentication we are just using roles not Permissions Important
+                .roles(STUDENT.name()) // This internally be ROLE_STUDENT
                 .build();
-        return new InMemoryUserDetailsManager(user);
+
+        UserDetails adminDetails = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("123456"))
+                //We can have more than one role for a user
+                //Important This is for role base authentication we are just using roles not Permissions Important
+                .roles(ADMIN.name()) // ROLE_ADMIN
+                .build();
+
+
+        return new InMemoryUserDetailsManager(userDetails, adminDetails);
     }
 
 
