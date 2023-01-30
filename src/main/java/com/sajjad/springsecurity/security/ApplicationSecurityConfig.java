@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -14,6 +15,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfig {
+
+    private final PasswordEncoder passwordEncoder;
+
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     //This How to use Basic Auth
@@ -39,7 +46,7 @@ public class ApplicationSecurityConfig {
 
         UserDetails user = User.builder()
                 .username("Sajjad")
-                .password("123456")
+                .password(passwordEncoder.encode("123456"))
                 .roles("STUDENT") // This internally be ROLE_STUDENT
                 .build();
         return new InMemoryUserDetailsManager(user);
