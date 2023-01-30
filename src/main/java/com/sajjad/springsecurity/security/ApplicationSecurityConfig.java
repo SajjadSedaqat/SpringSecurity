@@ -12,10 +12,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class ApplicationSecurityConfig {
 
+
+    //This How to use Basic Auth
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests()
+                //This is a replacement for antMatcher
+                .requestMatchers("/*", "index", "/css/*" , "/js/*").permitAll()
+                //This says any other request
                 .anyRequest()
                 .authenticated()
                 .and()
