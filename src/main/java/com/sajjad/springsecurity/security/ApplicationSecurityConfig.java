@@ -34,10 +34,16 @@ public class ApplicationSecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests()
                 //This is a replacement for antMatcher
+                //IMPORTANT the order we add this matcher really mather IMPORTANT
+                //The way spring security checks for these matchers is line by line
                 .requestMatchers("/*", "index", "/css/*", "/js/*").permitAll()
                 //Important This is for role base authentication we are just using roles not Permissions Important
                 .requestMatchers("/api/**").hasRole(STUDENT.name())
                 //This permission based authentication
+                //For example in the line below we are saying anyone with admin or admin trainee can access this api
+                //When spring sees this , will allow the request to be served
+                //Spring serves request according to any line that answers its request(whether the request has to be served
+                .requestMatchers("/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
                 .requestMatchers(HttpMethod.DELETE , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
                 .requestMatchers(HttpMethod.POST , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
                 .requestMatchers(HttpMethod.PUT , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
