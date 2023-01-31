@@ -11,8 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.sajjad.springsecurity.security.ApplicationUserRole.ADMIN;
-import static com.sajjad.springsecurity.security.ApplicationUserRole.STUDENT;
+import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 
 
 @Configuration
@@ -30,6 +29,7 @@ public class ApplicationSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeHttpRequests()
                 //This is a replacement for antMatcher
                 .requestMatchers("/*", "index", "/css/*", "/js/*").permitAll()
@@ -64,8 +64,16 @@ public class ApplicationSecurityConfig {
                 .roles(ADMIN.name()) // ROLE_ADMIN
                 .build();
 
+        UserDetails adminTraineeDetails = User.builder()
+                .username("tom")
+                .password(passwordEncoder.encode("123456"))
+                //We can have more than one role for a user
+                //Important This is for role base authentication we are just using roles not Permissions Important
+                .roles(ADMINTRAINEE.name()) // ROLE_ADMINTRAINEE
+                .build();
 
-        return new InMemoryUserDetailsManager(userDetails, adminDetails);
+
+        return new InMemoryUserDetailsManager(userDetails, adminDetails, adminTraineeDetails);
     }
 
 
