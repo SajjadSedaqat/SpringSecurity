@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 
@@ -31,20 +32,14 @@ public class ApplicationSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+
+                //This line makes spring to save CsrfToken inside Cookies
+                //https://docs.spring.io/spring-security/site/docs/5.0.x/reference/html/csrf.html
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .and()
                 .authorizeHttpRequests()
-                //This is a replacement for antMatcher
-                //IMPORTANT the order we add this matcher really mather IMPORTANT
-                //The way spring security checks for these matchers is line by line
                 .requestMatchers("/*", "index", "/css/*", "/js/*").permitAll()
-                //Important This is for role base authentication we are just using roles not Permissions Important
                 .requestMatchers("/api/**").hasRole(STUDENT.name())
-                //This permission based authentication
-//                .requestMatchers(HttpMethod.DELETE , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-//                .requestMatchers(HttpMethod.POST , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-//                .requestMatchers(HttpMethod.PUT , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-//                .requestMatchers(HttpMethod.GET,"/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
-                //This says any other request
                 .anyRequest()
                 .authenticated()
                 .and()
