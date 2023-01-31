@@ -3,7 +3,7 @@ package com.sajjad.springsecurity.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -12,12 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.sajjad.springsecurity.security.ApplicationUserPermission.COURSE_WRITE;
 import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class ApplicationSecurityConfig {
 
     private final PasswordEncoder passwordEncoder;
@@ -40,14 +40,10 @@ public class ApplicationSecurityConfig {
                 //Important This is for role base authentication we are just using roles not Permissions Important
                 .requestMatchers("/api/**").hasRole(STUDENT.name())
                 //This permission based authentication
-                //For example in the line below we are saying anyone with admin or admin trainee can access this api
-                //When spring sees this , will allow the request to be served
-                //Spring serves request according to any line that answers its request(whether the request has to be served
-                .requestMatchers("/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
-                .requestMatchers(HttpMethod.DELETE , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .requestMatchers(HttpMethod.POST , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .requestMatchers(HttpMethod.PUT , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
-                .requestMatchers(HttpMethod.GET,"/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
+//                .requestMatchers(HttpMethod.DELETE , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .requestMatchers(HttpMethod.POST , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .requestMatchers(HttpMethod.PUT , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+//                .requestMatchers(HttpMethod.GET,"/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
                 //This says any other request
                 .anyRequest()
                 .authenticated()
