@@ -3,6 +3,7 @@ package com.sajjad.springsecurity.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.sajjad.springsecurity.security.ApplicationUserPermission.COURSE_WRITE;
 import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 
 
@@ -35,6 +37,11 @@ public class ApplicationSecurityConfig {
                 .requestMatchers("/*", "index", "/css/*", "/js/*").permitAll()
                 //Important This is for role base authentication we are just using roles not Permissions Important
                 .requestMatchers("/api/**").hasRole(STUDENT.name())
+                //This permission based authentication
+                .requestMatchers(HttpMethod.DELETE , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .requestMatchers(HttpMethod.POST , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .requestMatchers(HttpMethod.PUT , "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .requestMatchers(HttpMethod.GET,"/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())
                 //This says any other request
                 .anyRequest()
                 .authenticated()
@@ -53,7 +60,8 @@ public class ApplicationSecurityConfig {
                 .username("Sajjad")
                 .password(passwordEncoder.encode("123456"))
                 //Important This is for role base authentication we are just using roles not Permissions Important
-                .roles(STUDENT.name()) // This internally be ROLE_STUDENT
+//                .roles(STUDENT.name()) // This internally be ROLE_STUDENT
+                .authorities(STUDENT.getGrantedAuthorities())
                 .build();
 
         UserDetails adminDetails = User.builder()
@@ -61,15 +69,17 @@ public class ApplicationSecurityConfig {
                 .password(passwordEncoder.encode("123456"))
                 //We can have more than one role for a user
                 //Important This is for role base authentication we are just using roles not Permissions Important
-                .roles(ADMIN.name()) // ROLE_ADMIN
+//                .roles(ADMIN.name()) // ROLE_ADMIN
+                .authorities(ADMIN.getGrantedAuthorities())
                 .build();
 
         UserDetails adminTraineeDetails = User.builder()
-                .username("tom")
+                .username("adminTrainee")
                 .password(passwordEncoder.encode("123456"))
                 //We can have more than one role for a user
                 //Important This is for role base authentication we are just using roles not Permissions Important
                 .roles(ADMINTRAINEE.name()) // ROLE_ADMINTRAINEE
+                .authorities(ADMINTRAINEE.getGrantedAuthorities())
                 .build();
 
 
