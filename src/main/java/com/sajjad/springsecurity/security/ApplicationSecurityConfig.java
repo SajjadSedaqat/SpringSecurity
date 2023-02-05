@@ -46,7 +46,13 @@ public class ApplicationSecurityConfig {
                 .defaultSuccessUrl("/courses", true)
                 .and()
                 .rememberMe().tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))//default is to two weeks
-                .key("somethingverysecure");//this key will be use to hash the values
+                .key("somethingverysecure")
+                .and()
+                    .logout()
+                    .clearAuthentication(true)
+                    .invalidateHttpSession(true)
+                    .deleteCookies("JSESSIONID", "remember-me")
+                     .logoutSuccessUrl("/login");//this key will be use to hash the values
 
 
 
