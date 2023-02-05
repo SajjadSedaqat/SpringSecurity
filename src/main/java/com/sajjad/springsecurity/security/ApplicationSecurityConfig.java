@@ -40,7 +40,8 @@ public class ApplicationSecurityConfig {
                 .authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login");
+                .loginPage("/login")
+                .defaultSuccessUrl("/courses", true);
 
 
         return http.build();
