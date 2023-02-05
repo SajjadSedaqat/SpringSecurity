@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 
 
@@ -41,7 +43,11 @@ public class ApplicationSecurityConfig {
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/courses", true);
+                .defaultSuccessUrl("/courses", true)
+                .and()
+                .rememberMe().tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))//default is to two weeks
+                .key("somethingverysecure");//this key will be use to hash the values
+
 
 
         return http.build();
