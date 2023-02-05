@@ -42,11 +42,15 @@ public class ApplicationSecurityConfig {
                 .authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                .defaultSuccessUrl("/courses", true)
+                    .loginPage("/login")
+                    .defaultSuccessUrl("/courses", true)
+                    .usernameParameter("username")// This means in the log in html username field should be name="username"
+                    .passwordParameter("password")// This means in the log in html password field should be name="password"
+
                 .and()
                 .rememberMe().tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))//default is to two weeks
-                .key("somethingverysecure")
+                    .key("somethingverysecure")
+                    .rememberMeParameter("remember-me")// This means in the log in html remember me field should be name="remember-me"
                 .and()
                     .logout()
                     .clearAuthentication(true)
