@@ -1,15 +1,16 @@
 package com.sajjad.springsecurity.security;
 
 
+import com.sajjad.springsecurity.auth.ApplicationUserDAO;
+import com.sajjad.springsecurity.auth.ApplicationUserService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.concurrent.TimeUnit;
@@ -22,9 +23,13 @@ import static com.sajjad.springsecurity.security.ApplicationUserRole.*;
 @EnableMethodSecurity
 public class ApplicationSecurityConfig {
 
+    private final ApplicationUserDAO applicationUserDAO;
+
     private final PasswordEncoder passwordEncoder;
 
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+    public ApplicationSecurityConfig(@Qualifier("fake") ApplicationUserDAO applicationUserDAO,
+                                     PasswordEncoder passwordEncoder) {
+        this.applicationUserDAO = applicationUserDAO;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -65,37 +70,10 @@ public class ApplicationSecurityConfig {
 
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-
-        UserDetails userDetails = User.builder()
-                .username("Sajjad")
-                .password(passwordEncoder.encode("123456"))
-                //Important This is for role base authentication we are just using roles not Permissions Important
-//                .roles(STUDENT.name()) // This internally be ROLE_STUDENT
-                .authorities(STUDENT.getGrantedAuthorities())
-                .build();
-
-        UserDetails adminDetails = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("123456"))
-                //We can have more than one role for a user
-                //Important This is for role base authentication we are just using roles not Permissions Important
-//                .roles(ADMIN.name()) // ROLE_ADMIN
-                .authorities(ADMIN.getGrantedAuthorities())
-                .build();
-
-        UserDetails adminTraineeDetails = User.builder()
-                .username("adminTrainee")
-                .password(passwordEncoder.encode("123456"))
-                //We can have more than one role for a user
-                //Important This is for role base authentication we are just using roles not Permissions Important
-                .roles(ADMINTRAINEE.name()) // ROLE_ADMINTRAINEE
-                .authorities(ADMINTRAINEE.getGrantedAuthorities())
-                .build();
-
-
-        return new InMemoryUserDetailsManager(userDetails, adminDetails, adminTraineeDetails);
+    UserDetailsService userDetailsService() {
+        return new ApplicationUserService(applicationUserDAO);
     }
+
 
 
 }
